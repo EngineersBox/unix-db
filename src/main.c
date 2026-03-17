@@ -36,7 +36,7 @@ uint32_t hash_func(const void* data, size_t size) {
 
 int main(const int argc, const char** argv) {
     const char* table_file = "./test_data/table.db";
-    HASHINFO hash_info = (HASHINFO) {
+    const HASHINFO hash_info = (HASHINFO) {
         .bsize = 256,
         .ffactor = 8,
         .nelem = 1,
