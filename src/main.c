@@ -22,6 +22,15 @@ uint32_t hash_func(const void* data, size_t size) {
     for (int i = 1; i < u32_count; i++) {
         value ^= u32_data[i];
     }
+    const size_t base = u32_count * sizeof(uint32_t);
+    const size_t excess = size - base;
+    if (excess == 0) {
+        return value;
+    }
+    const char* char_data = (char*) &u32_data[u32_count];
+    for (int i = base; i < base + excess; i++) {
+        value ^= char_data[i];
+    }
     return value;
 }
 
@@ -47,10 +56,10 @@ int main(const int argc, const char** argv) {
         return errno;
     }
     DBT key = (DBT) {
-        .data = "test",
-        .size = sizeof(char) * 4,
+        .data = "test this thing with other thing yeah",
+        .size = sizeof(char) * 37,
     };
-    DBT value = (DBT) {
+    const DBT value = (DBT) {
         .data = "some result data",
         .size = sizeof(char) * 16,
     };
