@@ -35,6 +35,11 @@ uint32_t hash_func(const void* data, size_t size) {
 }
 
 int main(const int argc, const char** argv) {
+    if (argc > 0) {
+        for (int i = 0; i < argc; i++) {
+            printf("Arg %d: %s\n", i, argv[i]);
+        }
+    }
     const char* table_file = "./test_data/table.db";
     const HASHINFO hash_info = (HASHINFO) {
         .bsize = 256,
