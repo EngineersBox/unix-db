@@ -35,12 +35,10 @@ uint32_t hash_func(const void* data, size_t size) {
 }
 
 int main(const int argc, const char** argv) {
-    if (argc > 0) {
-        for (int i = 0; i < argc; i++) {
-            printf("Arg %d: %s\n", i, argv[i]);
-        }
+    if (argc != 2) {
+        fprintf(stderr, "Usage: %s: <table file path>\n", argv[0]);
+        return 1;
     }
-    const char* table_file = "./test_data/table.db";
     const HASHINFO hash_info = (HASHINFO) {
         .bsize = 256,
         .ffactor = 8,
@@ -49,8 +47,9 @@ int main(const int argc, const char** argv) {
         .hash = &hash_func,
         .lorder = 1234,
     };
+    printf("Opening table %s\n", argv[1]);
     DB* db = dbopen(
-        table_file,
+        argv[1],
         O_CREAT | O_RDWR,
         0777,
         DB_HASH,
