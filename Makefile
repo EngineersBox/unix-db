@@ -1,10 +1,10 @@
-IDIR =./src/
-SDIR = ./src
+IDIR=./src/
+SDIR=./src
 CC=gcc
 CFLAGS=-I$(IDIR)
 
 ODIR=obj
-LDIR =../lib
+LDIR=./lib
 
 LIBS=-lm
 
