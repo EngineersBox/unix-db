@@ -138,13 +138,13 @@ int main(const int argc, const char** argv) {
     }
     printf("Reading data in\n");
     int fd = open(path, O_RDONLY);
-    lseek(fd, 0, SEEK_SET);
     if (fd < 1) {
         perror("Failed to open table metadata file");
         return 1;
     }
+    lseek(fd, 0, SEEK_SET);
     char buf_size_buf[sizeof(size_t)];
-    if (read(fd, buf_size_buf, sizeof(size_t)) > 0) {
+    if (read(fd, buf_size_buf, sizeof(size_t)) <= 0) {
         perror("Failed to read table metadata size from file");
         return 1;
     }
@@ -153,9 +153,9 @@ int main(const int argc, const char** argv) {
     struct TableMetadata meta = {0};
     char buf[buf_size];
     size_t buf_len;
-    if ((buf_len = read(fd, buf, buf_size)) > 0) {
+    if ((buf_len = read(fd, buf, buf_size)) <= 0) {
         perror("Failed to read table metadata bytes to buffer from file");
-            close(fd);
+        close(fd);
         return 1;
     }
     printf("Read bytes\n");
