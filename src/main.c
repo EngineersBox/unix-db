@@ -1,3 +1,5 @@
+#include "parsing.h"
+#include "table.h"
 #include <errno.h>
 #include <stdint.h>
 #include <stdlib.h>
@@ -5,6 +7,7 @@
 #include <fcntl.h>
 #include <db.h>
 #include <string.h>
+#include <unistd.h>
 
 uint32_t hash_func(const void* data, size_t size) {
     if (size < 1) {
@@ -34,7 +37,7 @@ uint32_t hash_func(const void* data, size_t size) {
     return value;
 }
 
-int main(const int argc, const char** argv) {
+int main1(const int argc, const char** argv) {
     if (argc != 2) {
         fprintf(stderr, "Usage: %s: <table file path>\n", argv[0]);
         return 1;
@@ -88,4 +91,82 @@ int main(const int argc, const char** argv) {
     memcpy(str_value, value_get.data, value_get.size);
     printf("Retrieved key '%s' with value '%s'\n", (char*) key.data, str_value);
     return db->close(db);
+}
+
+int main(const int argc, const char** argv) {
+    if (argc != 2) {
+        fprintf(stderr, "Usage: %s <in | out>\n", argv[0]);
+        return 1;
+    }
+    char* path = "./test_data/table.meta";
+    if (strncmp(argv[1], "out", 3) == 0) {
+        printf("Writing data out\n");
+        char* data_file_path = "./test_data/table.db";
+        struct TableMetadata meta = (struct TableMetadata) {
+            .type = TABLE_TYPE_BTREE,
+            .name_len = 4,
+            .name = "test",
+            .data_file_path_len = strlen(data_file_path),
+            .data_file_path = data_file_path,
+        };
+        int fd = open(path, O_CREAT | O_RDWR | O_TRUNC, 0641);
+        if (fd < 0) {
+            perror("Failed to create table metadata file");
+            return 1;
+        }
+        const size_t buf_size = tableMetadataSizeBytes(&meta);
+        char* buf = calloc(buf_size, sizeof(char));
+        if (tableMetadataSerialize(&meta, buf)) {
+            fprintf(stderr, "Failed to serialize table metadata\n");
+            close(fd);
+            return 1;
+        }
+        char buf_size_buf[sizeof(size_t)];
+        writeSizet(buf_size_buf, buf_size);
+        if (write(fd, buf_size_buf, sizeof(size_t)) == -1) {
+            perror("Failed to write table metadata size to file");
+            close(fd);
+            return 1;
+        }
+        if (write(fd, (void*) buf, buf_size) == -1) {
+            perror("Failed to write table metadata to file");
+            close(fd);
+            return 1;
+        }
+        close(fd);
+        return 0;
+    }
+    printf("Reading data in\n");
+    int fd = open(path, O_RDONLY);
+    lseek(fd, 0, SEEK_SET);
+    if (fd < 1) {
+        perror("Failed to open table metadata file");
+        return 1;
+    }
+    char buf_size_buf[sizeof(size_t)];
+    if (read(fd, buf_size_buf, sizeof(size_t)) > 0) {
+        perror("Failed to read table metadata size from file");
+        return 1;
+    }
+    size_t buf_size = atoi((char*) buf_size_buf);
+    printf("Buf size: %zu\n", buf_size);
+    struct TableMetadata meta = {0};
+    char buf[buf_size];
+    size_t buf_len;
+    if ((buf_len = read(fd, buf, buf_size)) > 0) {
+        perror("Failed to read table metadata bytes to buffer from file");
+            close(fd);
+        return 1;
+    }
+    printf("Read bytes\n");
+    if (tableMetadataDeserialize(buf, buf_len, &meta)) {
+        fprintf(stderr, "Failed to deserialize table metadata\n");
+        close(fd);
+        return 1;
+    }
+    printf("[META] Type: %d\n", meta.type);
+    printf("[META] Name: %s Len: %zu\n", meta.name, meta.name_len);
+    printf("[META] Path: %s Len: %zu\n", meta.data_file_path, meta.data_file_path_len);
+    close(fd);
+    return 0;
 }

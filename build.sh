@@ -1,3 +1,3 @@
 #!/usr/bin/env bash
 
-gcc -o unix_db src/main.c
+gcc -Isrc/ -lc -o unix_db src/main.c src/parsing.c src/table.c

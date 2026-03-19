@@ -1,14 +1,16 @@
 #include "table.h"
 
 #include "parsing.h"
+
 #include <stdio.h>
 #include <stdlib.h>
 
-int tableMetadataDeserialize(uint8_t* buf, size_t buf_len, struct TableMetadata* meta) {
+int tableMetadataDeserialize(char* buf, size_t buf_len, struct TableMetadata* meta) {
     const size_t original_buf_len = buf_len;
     uint8_t byte;
     int error = parseU8(&buf, &buf_len, &byte);
     if (error) {
+        fprintf(stderr, "Failed to parse type\n");
         return error;
     }
     if (byte < 0 || byte > TABLE_TYPE_BTREE) {
@@ -20,24 +22,28 @@ int tableMetadataDeserialize(uint8_t* buf, size_t buf_len, struct TableMetadata*
     size_t name_len;
     error = parseSizet(&buf, &buf_len, &name_len);
     if (error) {
+        fprintf(stderr, "Failed to parse name length\n");
         return error;
     }
 
     char* name = NULL;
     error = parseString(&buf, &buf_len, name_len, &name);
     if (error) {
+        fprintf(stderr, "Failed to parse name\n");
         return error;
     }
 
     size_t data_file_path_len;
     error = parseSizet(&buf, &buf_len, &data_file_path_len);
     if (error) {
+        fprintf(stderr, "Failed to parse path length\n");
         return error;
     }
 
     char* data_file_path = NULL;
     error = parseString(&buf, &buf_len, data_file_path_len, &data_file_path);
     if (error) {
+        fprintf(stderr, "Failed to parse path\n");
         return error;
     }
 
@@ -51,20 +57,24 @@ int tableMetadataDeserialize(uint8_t* buf, size_t buf_len, struct TableMetadata*
     return original_buf_len - buf_len;
 }
 
-int tableMetadataSerialize(struct TableMetadata* meta, uint8_t* buf) {
+int tableMetadataSerialize(struct TableMetadata* meta, char* buf) {
     int error;
     if ((error = writeU8(buf, (char) meta->type))) {
         return error;
     }
+    buf += 1;
     if ((error = writeSizet(buf, meta->name_len))) {
         return error;
     } 
+    buf += sizeof(size_t);
     if ((error = writeString(buf, meta->name, meta->name_len))) {
         return error;
     }
+    buf += meta->name_len;
     if ((error = writeSizet(buf, meta->data_file_path_len))) {
         return error;
     }
+    buf += sizeof(size_t);
     if ((error = writeString(buf, meta->data_file_path, meta->data_file_path_len))) {
         return error;
     }
@@ -73,10 +83,10 @@ int tableMetadataSerialize(struct TableMetadata* meta, uint8_t* buf) {
 
 int tableMetadataSizeBytes(struct TableMetadata* meta) {
     size_t bytes_count = 1;
-    bytes_count += bytesof(size_t);
-    bytes_count += meta->name_len * bytesof(char);
-    bytes_count += bytesof(size_t);
-    bytes_count += meta->data_file_path_len * bytesof(char);
+    bytes_count += sizeof(size_t);
+    bytes_count += meta->name_len * sizeof(char);
+    bytes_count += sizeof(size_t);
+    bytes_count += meta->data_file_path_len * sizeof(char);
     return bytes_count;
 }
 

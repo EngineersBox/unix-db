@@ -8,7 +8,6 @@
 
 #define ERROR_TABLE_TYPE_INVALID 0x1
 #define ERROR_TABLE_TYPE_BUF_TOO_SMALL 0x2
-#define ERROR_NO_MEMORY 0x3
 
 enum TableType {
     TABLE_TYPE_BTREE = 0,
@@ -27,12 +26,12 @@ struct TableMetadata {
 // Saturates `meta`
 // Returns count of bytes parsed from buf
 // otherwise -1 on error
-int tableMetadataDeserialize(uint8_t* buf, size_t buf_len, struct TableMetadata* meta);
+int tableMetadataDeserialize(char* buf, size_t buf_len, struct TableMetadata* meta);
 // Assumes buf contains enough space
 // to serialize the table metadata.
 // The size required can be acquired
 // from tableMetadataSizeBytes
-int tableMetadataSerialize(struct TableMetadata* meta, uint8_t* buf);
+int tableMetadataSerialize(struct TableMetadata* meta, char* buf);
 
 int tableMetadataSizeBytes(struct TableMetadata* meta);
 void tableMetadataFree(struct TableMetadata* meta);
