@@ -163,6 +163,7 @@ int main(const int argc, const char** argv) {
     printf("[META] Type: %d\n", meta.type);
     printf("[META] Name: %s Len: %zu\n", meta.name, meta.name_len);
     printf("[META] Path: %s Len: %zu\n", meta.data_file_path, meta.data_file_path_len);
+    tableMetadataFree(&meta);
     close(fd);
     return 0;
 }
