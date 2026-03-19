@@ -34,7 +34,7 @@ int parseString(char**buf, size_t* buf_len, size_t str_len, char** result) {
     if (*result == NULL) {
         return -ERROR_NO_MEMORY;
     }
-    memcpy(*result, *buf, str_len);
+    memcpy(*result, *buf, str_len * sizeof(char));
     *buf += str_len * sizeof(char);
     *buf_len -= str_len * sizeof(char);
     return 0;
@@ -51,6 +51,6 @@ int writeSizet(char* buf, size_t value) {
 }
 
 int writeString(char* buf, char* str, size_t str_len) {
-    snprintf(buf, str_len, "%s", str);
+    snprintf(buf, (str_len + 1) * sizeof(char), "%s", str);
     return 0;
 }

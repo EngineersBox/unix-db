@@ -101,14 +101,12 @@ int main(const int argc, const char** argv) {
     char* path = "./test_data/table.meta";
     if (strncmp(argv[1], "out", 3) == 0) {
         printf("Writing data out\n");
-        char* data_file_path = "./test_data/table.db";
-        struct TableMetadata meta = (struct TableMetadata) {
-            .type = TABLE_TYPE_BTREE,
-            .name_len = 4,
-            .name = "test",
-            .data_file_path_len = strlen(data_file_path),
-            .data_file_path = data_file_path,
-        };
+        struct TableMetadata meta = (struct TableMetadata) {0};
+        meta.type = TABLE_TYPE_HASH;
+        meta.name = "test";
+        meta.name_len = strlen(meta.name);
+        meta.data_file_path = "./test_data/table.db";
+        meta.data_file_path_len = strlen(meta.data_file_path);
         int fd = open(path, O_CREAT | O_RDWR | O_TRUNC, 0641);
         if (fd < 0) {
             perror("Failed to create table metadata file");
@@ -149,7 +147,6 @@ int main(const int argc, const char** argv) {
         return 1;
     }
     size_t buf_size = atoi((char*) buf_size_buf);
-    printf("Buf size: %zu\n", buf_size);
     struct TableMetadata meta = {0};
     char buf[buf_size];
     size_t buf_len;
@@ -158,8 +155,7 @@ int main(const int argc, const char** argv) {
         close(fd);
         return 1;
     }
-    printf("Read bytes\n");
-    if (tableMetadataDeserialize(buf, buf_len, &meta)) {
+    if (tableMetadataDeserialize(buf, buf_len, &meta) < 0) {
         fprintf(stderr, "Failed to deserialize table metadata\n");
         close(fd);
         return 1;

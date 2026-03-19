@@ -13,7 +13,7 @@ int tableMetadataDeserialize(char* buf, size_t buf_len, struct TableMetadata* me
         fprintf(stderr, "Failed to parse type\n");
         return error;
     }
-    if (byte < 0 || byte > TABLE_TYPE_BTREE) {
+    if (byte < 0 || byte > TABLE_TYPE_RECNO) {
         fprintf(stderr, "Invalid table type: %d\n", (int) byte);
         return -ERROR_TABLE_TYPE_INVALID;
     }
