@@ -51,7 +51,7 @@ static int parseOperation(struct Lexer* lexer, struct Operation* operation) {
             fprintf(stderr, "Missing operation type parser implementation for %s\n", lexerCurrentString(lexer));
             return -1;
     }
-    return 0;
+    return !lexerNextSymbol(lexer) && lexerCurrentSymbol(lexer) == SEMICOLON;
 }
 
 int parseOperations(char* buf, size_t buf_len, cvector(struct Operation)* out_tokens) {
