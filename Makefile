@@ -8,10 +8,10 @@ LDIR=./lib
 
 LIBS=-lm
 
-_DEPS = parsing.h table.h operation.h
+_DEPS = cvector.h cvector_utils.h lexer.h math_utils.h operation.h parser.h parsing.h table.h
 DEPS = $(patsubst %,$(IDIR)/%,$(_DEPS))
 
-_OBJ = main.o parsing.o table.o operation.o
+_OBJ = main.o lexer.o operation.o parser.o parsing.o table.o
 OBJ = $(patsubst %,$(ODIR)/%,$(_OBJ))
 
 

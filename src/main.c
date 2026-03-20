@@ -1,3 +1,7 @@
+#include "cvector.h"
+#include "lexer.h"
+#include "operation.h"
+#include "parser.h"
 #include "parsing.h"
 #include "table.h"
 #include <errno.h>
@@ -93,7 +97,7 @@ int main1(const int argc, const char** argv) {
     return db->close(db);
 }
 
-int main(const int argc, const char** argv) {
+int main2(const int argc, const char** argv) {
     if (argc != 2) {
         fprintf(stderr, "Usage: %s <in | out>\n", argv[0]);
         return 1;
@@ -165,5 +169,26 @@ int main(const int argc, const char** argv) {
     printf("[META] Path: %s Len: %zu\n", meta.data_file_path, meta.data_file_path_len);
     tableMetadataFree(&meta);
     close(fd);
+    return 0;
+}
+
+static void opsFree(void* elem) {
+    operationFree((struct Operation*) elem);
+}
+
+int main(const int argc, const char** argv) {
+    if (argc < 2) {
+        fprintf(stderr, "Usage: %s <operation string>\n", argv[0]);
+        return 1;
+    }
+    char* buf = (char*) argv[1];
+    size_t buf_len = strlen(buf);
+    cvector(struct Operation) operations = NULL;
+    cvector_init(operations, 1, opsFree);
+    if (parseOperations(buf, buf_len, &operations)) {
+        fprintf(stderr, "Failed to parse operations\n");
+        return 1;
+    }
+    cvector_free(operations);
     return 0;
 }

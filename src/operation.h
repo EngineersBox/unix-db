@@ -5,11 +5,7 @@
 
 #include <stddef.h>
 
-#define ERROR_INVALID_OPERATION 0x1
-#define ERROR_INVALID_OP_CREATE 0x2
-#define ERROR_INVALID_OP_DROP 0x3
-
-enum OperationType {
+enum OpType {
     OP_CREATE = 0,
     OP_DROP = 1,
     OP_SELECT = 2,
@@ -17,10 +13,8 @@ enum OperationType {
     OP_DELETE = 4,
 };
 
-#define OPERATION_TYPE_COUNT 5
-extern const char* operation_type_tokens[OPERATION_TYPE_COUNT];
-
-size_t operationTypeParse(char* buf, size_t buf_len, enum OperationType* out_type);
+#define OP_TYPE_COUNT 5
+extern const char* op_type_tokens[OP_TYPE_COUNT];
 
 enum OpCreateType {
     OP_CREATE_TABLE = 0,
@@ -29,8 +23,6 @@ enum OpCreateType {
 #define OP_CREATE_TYPE_COUNT 1
 extern const char* op_create_type_tokens[OP_CREATE_TYPE_COUNT];
 
-size_t opCreateTypeParse(char* buf, size_t buf_len, enum OpCreateType* out_type);
-
 enum OpDropType {
     OP_DROP_TABLE = 0,
 };
@@ -38,6 +30,40 @@ enum OpDropType {
 #define OP_DROP_TYPE_COUNT 1
 extern const char* op_drop_type_tokens[OP_DROP_TYPE_COUNT];
 
-size_t opDropTypeParse(char* buf, size_t buf_len, enum OpDropType* out_type);
+// ---- Structures ----
+
+struct OpCreate;
+struct OpDrop;
+
+struct Operation {
+    enum OpType type;
+    union {
+        struct OpCreate* create;
+        struct OpDrop* drop;
+    };
+};
+
+void operationFree(struct Operation* operation);
+
+enum TableType {
+    TABLE_TYPE_BTREE = 0,
+    TABLE_TYPE_HASH = 1,
+    TABLE_TYPE_RECNO = 2
+};
+
+struct OpCreate {
+    enum TableType type;
+    char* table_name;
+    size_t table_name_len;
+};
+
+void opCreateFree(struct OpCreate* op_create);
+
+struct OpDrop {
+    char* table_name;
+    size_t table_name_len;
+};
+
+void opDropFree(struct OpDrop* op_drop);
 
 #endif // _UNIX_DB_QUERY_H_

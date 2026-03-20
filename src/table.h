@@ -6,14 +6,10 @@
 #include <stddef.h>
 #include <stdint.h>
 
+#include "operation.h"
+
 #define ERROR_TABLE_TYPE_INVALID 0x1
 #define ERROR_TABLE_TYPE_BUF_TOO_SMALL 0x2
-
-enum TableType {
-    TABLE_TYPE_BTREE = 0,
-    TABLE_TYPE_HASH = 1,
-    TABLE_TYPE_RECNO = 2
-};
 
 struct TableMetadata {
     enum TableType type;
