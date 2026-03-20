@@ -20,7 +20,7 @@ enum OperationType {
 #define OPERATION_TYPE_COUNT 5
 extern const char* operation_type_tokens[OPERATION_TYPE_COUNT];
 
-size_t operationParseType(char* buf, size_t buf_len, enum OperationType* out_type);
+size_t operationTypeParse(char* buf, size_t buf_len, enum OperationType* out_type);
 
 enum OpCreateType {
     OP_CREATE_TABLE = 0,
@@ -29,7 +29,7 @@ enum OpCreateType {
 #define OP_CREATE_TYPE_COUNT 1
 extern const char* op_create_type_tokens[OP_CREATE_TYPE_COUNT];
 
-size_t opCreateParseType(char* buf, size_t buf_len, enum OpCreateType* out_type);
+size_t opCreateTypeParse(char* buf, size_t buf_len, enum OpCreateType* out_type);
 
 enum OpDropType {
     OP_DROP_TABLE = 0,
@@ -38,6 +38,6 @@ enum OpDropType {
 #define OP_DROP_TYPE_COUNT 1
 extern const char* op_drop_type_tokens[OP_DROP_TYPE_COUNT];
 
-size_t opDropParseType(char* buf, size_t buf_len, enum OpDropType* out_type);
+size_t opDropTypeParse(char* buf, size_t buf_len, enum OpDropType* out_type);
 
 #endif // _UNIX_DB_QUERY_H_

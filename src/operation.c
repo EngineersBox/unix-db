@@ -19,7 +19,7 @@ const char* op_drop_type_tokens[OP_DROP_TYPE_COUNT] = {
     "TABLE"
 };
 
-size_t operationParseType(char* buf, size_t buf_len, enum OperationType* out_type) {
+size_t operationTypeParse(char* buf, size_t buf_len, enum OperationType* out_type) {
     char* str = NULL;
     size_t str_len = parseStringUntil(buf, buf_len, ' ', &str);
     if (str_len <= 0) {
@@ -39,7 +39,7 @@ size_t operationParseType(char* buf, size_t buf_len, enum OperationType* out_typ
     return str_len;
 }
 
-size_t opCreateParseType(char* buf, size_t buf_len, enum OpCreateType* out_type) {
+size_t opCreateTypeParse(char* buf, size_t buf_len, enum OpCreateType* out_type) {
     char* str = NULL;
     size_t str_len = parseStringUntil(buf, buf_len, ' ', &str);
     if (str_len <= 0) {
@@ -59,7 +59,7 @@ size_t opCreateParseType(char* buf, size_t buf_len, enum OpCreateType* out_type)
     return str_len;
 }
 
-size_t opDropParseType(char* buf, size_t buf_len, enum OpDropType* out_type) {
+size_t opDropTypeParse(char* buf, size_t buf_len, enum OpDropType* out_type) {
     char* str = NULL;
     size_t str_len = parseStringUntil(buf, buf_len, ' ', &str);
     if (str_len <= 0) {
