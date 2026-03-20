@@ -14,9 +14,14 @@
     (buf_len) -= (count); \
 })
 
+// Returns negative error code or buf parsed bytes count on success
 size_t parseU8(char* buf, size_t buf_len, uint8_t* result);
+// Returns negative error code or buf parsed bytes count on success
 size_t parseSizet(char* buf, size_t buf_len, size_t* result);
+// Returns negative error code or buf parsed bytes count on success
 size_t parseString(char*buf, size_t buf_len, size_t str_len, char** result);
+// Returns negative error code or string bytes count on success
+size_t parseStringUntil(char* buf, size_t buf_len, char until, char** result);
 
 int writeU8(char* buf, uint8_t value);
 int writeSizet(char* buf, size_t value);

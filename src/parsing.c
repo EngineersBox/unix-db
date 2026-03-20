@@ -34,6 +34,20 @@ size_t parseString(char* buf, size_t buf_len, size_t str_len, char** result) {
     return str_len * sizeof(char);
 }
 
+size_t parseStringUntil(char* buf, size_t buf_len, char until, char** result) {
+    if (buf_len <= 0) {
+        return -ERROR_BUF_TOO_SMALL;
+    }
+    size_t str_len = 0;
+    for (char* end = buf; str_len < buf_len && *end != until; str_len++, end++);
+    *result = calloc(str_len, sizeof(char));
+    if (*result == NULL) {
+        return -ERROR_NO_MEMORY;
+    }
+    memcpy(*result, buf, str_len * sizeof(char));
+    return str_len * sizeof(char);
+}
+
 int writeU8(char* buf, uint8_t value) {
     *buf = value;
     return 0;
