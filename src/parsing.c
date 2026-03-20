@@ -39,7 +39,14 @@ size_t parseStringUntil(char* buf, size_t buf_len, char until, char** result) {
         return -ERROR_BUF_TOO_SMALL;
     }
     size_t str_len = 0;
-    for (char* end = buf; str_len < buf_len && *end != until; str_len++, end++);
+    char* end = buf;
+    while (*end != until) {
+        if (str_len >= buf_len) {
+            return -ERROR_BUF_TOO_SMALL;
+        }
+        str_len++;
+        end++;
+    }
     *result = calloc(str_len, sizeof(char));
     if (*result == NULL) {
         return -ERROR_NO_MEMORY;
