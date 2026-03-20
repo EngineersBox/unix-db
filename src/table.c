@@ -8,11 +8,12 @@
 int tableMetadataDeserialize(char* buf, size_t buf_len, struct TableMetadata* meta) {
     const size_t original_buf_len = buf_len;
     uint8_t byte;
-    int error = parseU8(&buf, &buf_len, &byte);
-    if (error) {
+    int byte_count = parseU8(buf, buf_len, &byte);
+    if (byte_count <= 0) {
         fprintf(stderr, "Failed to parse type\n");
-        return error;
+        return byte_count;
     }
+    shiftBuf(buf, buf_len, byte_count);
     if (byte < 0 || byte > TABLE_TYPE_RECNO) {
         fprintf(stderr, "Invalid table type: %d\n", (int) byte);
         return -ERROR_TABLE_TYPE_INVALID;
@@ -20,32 +21,36 @@ int tableMetadataDeserialize(char* buf, size_t buf_len, struct TableMetadata* me
     const enum TableType type = (enum TableType) byte;
 
     size_t name_len;
-    error = parseSizet(&buf, &buf_len, &name_len);
-    if (error) {
+    byte_count = parseSizet(buf, buf_len, &name_len);
+    if (byte_count <= 0) {
         fprintf(stderr, "Failed to parse name length\n");
-        return error;
+        return byte_count;
     }
+    shiftBuf(buf, buf_len, byte_count);
 
     char* name = NULL;
-    error = parseString(&buf, &buf_len, name_len, &name);
-    if (error) {
+    byte_count = parseString(buf, buf_len, name_len, &name);
+    if (byte_count <= 0) {
         fprintf(stderr, "Failed to parse name\n");
-        return error;
+        return byte_count;
     }
+    shiftBuf(buf, buf_len, byte_count);
 
     size_t data_file_path_len;
-    error = parseSizet(&buf, &buf_len, &data_file_path_len);
-    if (error) {
+    byte_count = parseSizet(buf, buf_len, &data_file_path_len);
+    if (byte_count <= 0) {
         fprintf(stderr, "Failed to parse path length\n");
-        return error;
+        return byte_count;
     }
+    shiftBuf(buf, buf_len, byte_count);
 
     char* data_file_path = NULL;
-    error = parseString(&buf, &buf_len, data_file_path_len, &data_file_path);
-    if (error) {
+    byte_count = parseString(buf, buf_len, data_file_path_len, &data_file_path);
+    if (byte_count <= 0) {
         fprintf(stderr, "Failed to parse path\n");
-        return error;
+        return byte_count;
     }
+    shiftBuf(buf, buf_len, byte_count);
 
     *meta = (struct TableMetadata) {
         .type = type,

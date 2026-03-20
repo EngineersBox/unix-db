@@ -9,9 +9,14 @@
 #define ERROR_BUF_TOO_SMALL 0x1
 #define ERROR_NO_MEMORY 0x2
 
-int parseU8(char** buf, size_t* buf_len, uint8_t* result);
-int parseSizet(char** buf, size_t* buf_len, size_t* result);
-int parseString(char**buf, size_t* buf_len, size_t str_len, char** result);
+#define shiftBuf(buf, buf_len, count) ({\
+    (buf) += (count); \
+    (buf_len) -= (count); \
+})
+
+size_t parseU8(char* buf, size_t buf_len, uint8_t* result);
+size_t parseSizet(char* buf, size_t buf_len, size_t* result);
+size_t parseString(char*buf, size_t buf_len, size_t str_len, char** result);
 
 int writeU8(char* buf, uint8_t value);
 int writeSizet(char* buf, size_t value);
